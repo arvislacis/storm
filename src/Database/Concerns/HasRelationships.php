@@ -792,7 +792,12 @@ trait HasRelationships
             $object = $this->extensionData['extensions'][$extension];
             $method = new \ReflectionMethod($object, $name);
         } elseif (isset($this->extensionData['dynamicMethods'][$name])) {
-            $method = new \ReflectionFunction($this->extensionData['dynamicMethods'][$name]->getClosure());
+            $dynamicMethod = $this->extensionData['dynamicMethods'][$name];
+            if (is_array($dynamicMethod)) {
+                $method = new \ReflectionMethod(...$dynamicMethod);
+            } else {
+                $method = new \ReflectionFunction($dynamicMethod->getClosure());
+            }
         } else {
             if (!isset(static::$resolvedNonRelationMethods[static::class])) {
                 static::$resolvedNonRelationMethods[static::class] = [$name];
